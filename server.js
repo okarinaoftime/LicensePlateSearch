@@ -1,9 +1,14 @@
-const http = require('https');
+const http = require('http');
+const fs = require('fs');
 const axios = require('axios');
 const https = require('https');
 
+const sslOptions = {
+  key: fs.readFileSync('./privatekey.pem'), // Replace with the path to your private key
+  cert: fs.readFileSync('./cert.pem') // Replace with the path to your SSL certificate
+};
 
-const server = http.createServer((req, res) => {
+const server = https.createServer(sslOptions, (req, res) => {
   if (req.method === 'POST' && req.url === '/lookup') {
     let data = '';
     req.on('data', chunk => {
@@ -13,7 +18,7 @@ const server = http.createServer((req, res) => {
       const requestData = JSON.parse(data);
       const licensePlate = requestData.licensePlate;
       const licenseState = requestData.licenseState;
-      lookupLicensePlate(licensePlate, licenseState);
+      lookupLicensePlate(licensePlate, licenseState, res);
     });
   } else {
     res.statusCode = 404;
@@ -27,23 +32,19 @@ server.listen(port, () => {
 });
 
 
-const options = {
-    method: 'GET',
-    hostname: 'apibroker-license-plate-search-v1.p.rapidapi.com',
-    path: '/license-plate-search?format=json&state=${licenseState}&plate=${licensePlate}',
+
+function lookupLicensePlate(licensePlate, licenseState, res) {
+  const apiUrl = `https://apibroker-license-plate-search-v1.p.rapidapi.com/license-plate-search?format=json&state=${licenseState}&plate=${licensePlate}`;
+
+  axios.get(apiUrl, {
     headers: {
       'X-RapidAPI-Key': '3c9e60fb1dmshec25838c52f693cp17550fjsn37bd7d522c31',
       'X-RapidAPI-Host': 'apibroker-license-plate-search-v1.p.rapidapi.com'
     }
-  };
-
-
-function lookupLicensePlate(licensePlate, licenseState) {
-  const apiUrl = `https://apibroker-license-plate-search-v1.p.rapidapi.com/license-plate-search?format=json&state=${licenseState}&plate=${licensePlate}`;
-
-  axios.get(apiUrl)
+  })
     .then(response => {
       const data = response.data;
+      console.log(data);
       const result = {
         make: data.make,
         model: data.model
@@ -61,18 +62,4 @@ function lookupLicensePlate(licensePlate, licenseState) {
       res.end(JSON.stringify(result));
     });
 }
-
-const req = https.request(options, function (res) {
-	const chunks = [];
-
-	res.on('data', function (chunk) {
-		chunks.push(chunk);
-	});
-
-	res.on('end', function () {
-		const body = Buffer.concat(chunks);
-		console.log(body.toString());
-	});
-});
-
 

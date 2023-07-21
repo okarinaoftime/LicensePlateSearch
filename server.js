@@ -4,8 +4,8 @@ const axios = require('axios');
 const https = require('https');
 
 const sslOptions = {
-  key: fs.readFileSync('./privatekey.pem'), // Replace with the path to your private key
-  cert: fs.readFileSync('./cert.pem') // Replace with the path to your SSL certificate
+  key: fs.readFileSync('./privatekey.pem'),
+  cert: fs.readFileSync('./cert.pem')
 };
 
 const server = https.createServer(sslOptions, (req, res) => {

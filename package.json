@@ -1,0 +1,19 @@
+{
+  "name": "team-project",
+  "version": "1.0.0",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "K",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "express": "^4.18.2",
+    "server": "^1.0.38"
+  },
+  "devDependencies": {},
+  "description": ""
+}
